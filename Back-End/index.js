@@ -1,20 +1,35 @@
-import express from 'express';
-import bodyparser from 'body-parser'
-
-import userRoute from './routes/users.js'
-
+const express = require("express");
+const mongoose = require("mongoose");
+const profileRoute = require("./routes/profile.route.js");
+require('dotenv').config()
 const app = express();
 
-const PORT = 3000
-
-app.use(bodyparser.json())
-
-app.use('/users', userRoute)
-
-app.get('/', (req, res) => {
-    console.log('[GET ROUTE]');
-    res.send("Hello from homepage")
-})
+// middleware
+app.use(express.json());
+app.use(express.urlencoded({ extended: false }));
 
 
-app.listen(PORT, () => console.log("Server running on port:", PORT))
+// routes
+app.use("/api/profiles", profileRoute);
+
+
+app.get("/", (req, res) => {
+  res.send("Hello from Node API server");
+});
+
+const url = process.env.MONGODB_URI
+const port = process.env.PORT
+
+mongoose
+  .connect(
+    url
+  )
+  .then(() => {
+    console.log("Connected to database!");
+    app.listen(port, () => {
+      console.log("Server is running on port", port);
+    });
+  })
+  .catch(() => {
+    console.log("Connection failed!");
+  });
